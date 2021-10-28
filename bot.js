@@ -1,6 +1,12 @@
+// import prisma from "./core/prisma";
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
+const prisma = new PrismaClient()
 const token = process.env.TOKEN;
 
-const Bot = require('node-telegram-bot-api');
+// const Bot = require('node-telegram-bot-api');
+import Bot from 'node-telegram-bot-api';
+// const prisma = require("./core/prisma");
 let bot;
 
 if(process.env.NODE_ENV === 'production') {
@@ -13,11 +19,16 @@ else {
 
 console.log('Bot server started in the ' + process.env.NODE_ENV + ' mode');
 
-bot.on('message', (msg) => {
+bot.on('message', async (msg) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      id: 1
+    }
+  });
   const name = msg.from.first_name;
-  bot.sendMessage(msg.chat.id, 'Hello, ' + name + '!' + process.env.NODE_ENV).then(() => {
+  bot.sendMessage(msg.chat.id, 'Hello, ' + name + '!' + user.first_name).then(() => {
     // reply sent!
   });
 });
 
-module.exports = bot;
+export default bot;
